@@ -1,6 +1,7 @@
 # hubzero-workspace-testenv
 An environment for testing the programs that make up the hubzero workspace
 
+
 # Building the environment
 
 The Makefile's ```all``` target can be used to build the docker container
@@ -10,6 +11,9 @@ developing and testing the programs that make up the workspace.
 ```
 make all
 ```
+
+Building the environment takes about an hour.
+
 
 # Accessing the environment
 
@@ -38,12 +42,11 @@ run as the ```guest``` user. The SESSION environment variable is hard coded to
 environment variable is also set. An X Virtual Frame Buffer is started to run
 the command. For more details, see entry.sh in the repository.
 
-Example of running a command:
+Examples of running commands in the container:
 
 1. ```echo ${HOME}```
 ```
 docker run -i -t --rm \
-    --name invokeapp-test-container \
     workspace \
     echo \${HOME}
 ```
