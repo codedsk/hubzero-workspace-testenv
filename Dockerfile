@@ -183,7 +183,8 @@ COPY setup_mock_workspace_apps_directory.sh  /tmp/
 RUN /tmp/setup_mock_workspace_apps_directory.sh
 
 # install rappture
-RUN git clone https://github.com/hubzero/hapi; \
+RUN basedir=`pwd`; \
+    git clone https://github.com/hubzero/hapi; \
     cd hapi/scripts; \
     ./rappture-latest_install.sh; \
     cd /apps/share64/debian7/rappture; \
@@ -198,7 +199,9 @@ RUN git clone https://github.com/hubzero/hapi; \
     ln -s current/man man; \
     ln -s current/share share; \
     cd /apps/share64/debian7/environ.d; \
-    ln -s /apps/share64/debian7/rappture/bin/rappture.use rappture;
+    ln -s /apps/share64/debian7/rappture/bin/rappture.use rappture; \
+    cd ${basedir}; \
+    rm -rf hapi;
 
 # switch back to root user
 USER root
