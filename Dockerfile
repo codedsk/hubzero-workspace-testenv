@@ -73,7 +73,15 @@ FROM debian:7
 # pyton-pip
 # xvfb
 
-# add openssh client and server so we can ssh into the container for debugging
+# add openssh client and server so we can ssh into the container
+# for debugging
+
+# don't install hubzero-rappture package because:
+# 1. it is an old version of Rappture
+# 2. it creates a use script in /apps/share/environ.d/rappture
+#    which is not a path that "use" looks in for environments.
+#    if we setup the os version base directory structure like
+#    do on production hubs (ie. /apps/share/debian7/environ.d/).
 
 RUN apt-get update && apt-get install -y \
         wget; \
@@ -96,7 +104,6 @@ RUN apt-get update && apt-get install -y \
         hubzero-icewm-themes \
         hubzero-invokeapp \
         hubzero-mw-session \
-        hubzero-rappture \
         hubzero-ratpoison-captive \
         hubzero-tigervnc-server \
         hubzero-twm-captive \
@@ -174,15 +181,35 @@ EXPOSE 22
 
 # create /apps directory
 RUN mkdir -p /apps; \
-    chown apps:apps /apps; \
+    chown -R apps:apps /apps; \
     chmod 775 /apps;
 
-# populate the /apps directory structure as the apps user
+# become the apps user to:
+# 1. create the /apps directory structure
+# 2. install Rappture Toolkit manually
 USER apps
-COPY setup_mock_workspace_apps_directory.sh  /tmp/
-RUN /tmp/setup_mock_workspace_apps_directory.sh
+
+# populate the /apps directory structure
+# running apps_directory_structure_update.sh will result in "hide"ing
+# the rappture installation that comes from the hubzero-rappture
+# package because it creates an os version based directory structure
+# (ie. /apps/share/debian7/environ.d) which supersedes where the
+# hubzero-rappture package places the rappture "use" script
+# (/apps/share/environ.d)
+RUN basedir=`pwd`; \
+    git clone https://github.com/hubzero/hapi; \
+    cd hapi/scripts; \
+    ./apps_directory_structure_update.sh; \
+    cd ${basedir}; \
+    rm -rf hapi;
 
 # install rappture
+# the rappture-latest_install.sh has the path /apps/share64/debian7/rappture
+# hardcoded inside of it. we should create a function we can source inside
+# of scripts to calculate the install prefix path. it is the first few lines
+# of apps_directory_structure_update.sh. we should also put all of the link
+# creation commands, shown below, into a hapi script that can be run as
+# necessary.
 RUN basedir=`pwd`; \
     git clone https://github.com/hubzero/hapi; \
     cd hapi/scripts; \
