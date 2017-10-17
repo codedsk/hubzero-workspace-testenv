@@ -196,7 +196,9 @@ USER apps
 # (ie. /apps/share/debian7/environ.d) which supersedes where the
 # hubzero-rappture package places the rappture "use" script
 # (/apps/share/environ.d)
-RUN basedir=`pwd`; \
+RUN set -e; \
+    cd /tmp; \
+    basedir=`pwd`; \
     git clone https://github.com/hubzero/hapi; \
     cd hapi/scripts; \
     ./apps_directory_structure_update.sh; \
@@ -210,7 +212,9 @@ RUN basedir=`pwd`; \
 # of apps_directory_structure_update.sh. we should also put all of the link
 # creation commands, shown below, into a hapi script that can be run as
 # necessary.
-RUN basedir=`pwd`; \
+RUN set -e; \
+    cd /tmp; \
+    basedir=`pwd`; \
     git clone https://github.com/hubzero/hapi; \
     cd hapi/scripts; \
     ./rappture-latest_install.sh; \
